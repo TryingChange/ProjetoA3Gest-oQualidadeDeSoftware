@@ -1,0 +1,50 @@
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.android.AndroidDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import java.net.URL;
+
+public class ResponseTimeTest {
+    public static void main(String[] args) {
+        DesiredCapabilities caps = new DesiredCapabilities();
+        caps.setCapability("deviceName", "emulator-5554");
+        caps.setCapability("platformName", "Android");
+        caps.setCapability("app", "/path/to/your/app.apk");
+
+        try {
+            AppiumDriver<MobileElement> driver = new AndroidDriver<>(new URL("http://127.0.0.1:4723/wd/hub"), caps);
+
+            // Medir tempo de resposta para login
+            long startTime = System.currentTimeMillis();
+            MobileElement usernameField = driver.findElementById("username_field_id");
+            usernameField.sendKeys("valid_username");
+            MobileElement passwordField = driver.findElementById("password_field_id");
+            passwordField.sendKeys("valid_password");
+            MobileElement loginButton = driver.findElementById("login_button_id");
+            loginButton.click();
+            MobileElement homeScreen = driver.findElementById("home_screen_id");
+            while (!homeScreen.isDisplayed()) {
+                // Aguardar a tela inicial ser exibida
+            }
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+            System.out.println("Tempo de resposta para login: " + duration + " ms");
+
+            // Medir tempo de resposta para navegação
+            MobileElement nextScreenButton = driver.findElementById("next_screen_button_id");
+            startTime = System.currentTimeMillis();
+            nextScreenButton.click();
+            MobileElement newScreen = driver.findElementById("new_screen_id");
+            while (!newScreen.isDisplayed()) {
+                // Aguardar a nova tela ser exibida
+            }
+            endTime = System.currentTimeMillis();
+            duration = endTime - startTime;
+            System.out.println("Tempo de resposta para navegação: " + duration + " ms");
+
+            driver.quit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

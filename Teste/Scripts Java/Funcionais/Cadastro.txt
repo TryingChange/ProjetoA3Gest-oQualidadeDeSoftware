@@ -1,0 +1,55 @@
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.android.AndroidDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import java.net.URL;
+
+public class RegistrationTest {
+    public static void main(String[] args) {
+        DesiredCapabilities caps = new DesiredCapabilities();
+        caps.setCapability("deviceName", "emulator-5554");
+        caps.setCapability("platformName", "Android");
+        caps.setCapability("app", "/path/to/your/app.apk");
+
+        try {
+            AppiumDriver<MobileElement> driver = new AndroidDriver<>(new URL("http://127.0.0.1:4723/wd/hub"), caps);
+
+            // Passo 2: Navegar até a tela de registro
+            MobileElement registrationScreen = driver.findElementById("registration_screen_id");
+            assert(registrationScreen.isDisplayed());
+
+            // Passo 3: Preencher todos os campos obrigatórios com dados válidos
+            MobileElement usernameField = driver.findElementById("username_field_id");
+            usernameField.sendKeys("new_username");
+            MobileElement passwordField = driver.findElementById("password_field_id");
+            passwordField.sendKeys("new_password");
+            MobileElement emailField = driver.findElementById("email_field_id");
+            emailField.sendKeys("new_email@example.com");
+
+            // Passo 4: Clicar no botão de registro
+            MobileElement registerButton = driver.findElementById("register_button_id");
+            registerButton.click();
+
+            // Passo 5: Verificar se o usuário é registrado com sucesso e redirecionado para a tela inicial
+            MobileElement homeScreen = driver.findElementById("home_screen_id");
+            assert(homeScreen.isDisplayed());
+
+            // Passo 6: Tentar registrar com dados inválidos ou campos obrigatórios faltando
+            usernameField.clear();
+            usernameField.sendKeys("");
+            passwordField.clear();
+            passwordField.sendKeys("short");
+            emailField.clear();
+            emailField.sendKeys("invalid_email");
+
+            // Passo 7: Verificar se uma mensagem de erro apropriada é exibida
+            registerButton.click();
+            MobileElement errorMessage = driver.findElementById("error_message_id");
+            assert(errorMessage.isDisplayed());
+
+            driver.quit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

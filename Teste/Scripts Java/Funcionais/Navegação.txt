@@ -1,0 +1,38 @@
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.android.AndroidDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import java.net.URL;
+
+public class NavigationTest {
+    public static void main(String[] args) {
+        DesiredCapabilities caps = new DesiredCapabilities();
+        caps.setCapability("deviceName", "emulator-5554");
+        caps.setCapability("platformName", "Android");
+        caps.setCapability("app", "/path/to/your/app.apk");
+
+        try {
+            AppiumDriver<MobileElement> driver = new AndroidDriver<>(new URL("http://127.0.0.1:4723/wd/hub"), caps);
+
+            // Passo 2: Navegar da tela inicial para outra tela
+            MobileElement nextScreenButton = driver.findElementById("next_screen_button_id");
+            nextScreenButton.click();
+
+            // Passo 3: Verificar se a navegação ocorreu corretamente
+            MobileElement newScreen = driver.findElementById("new_screen_id");
+            assert(newScreen.isDisplayed());
+
+            // Passo 4: Navegar de volta para a tela inicial
+            MobileElement backButton = driver.findElementById("back_button_id");
+            backButton.click();
+
+            // Passo 5: Verificar se a navegação de retorno ocorreu corretamente
+            MobileElement homeScreen = driver.findElementById("home_screen_id");
+            assert(homeScreen.isDisplayed());
+
+            driver.quit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

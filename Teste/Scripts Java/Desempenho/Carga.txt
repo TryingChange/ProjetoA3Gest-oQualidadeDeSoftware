@@ -1,0 +1,56 @@
+import org.apache.jmeter.protocol.http.sampler.HTTPSampler;
+import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.threads.ThreadGroup;
+import org.apache.jmeter.util.JMeterUtils;
+import org.apache.jmeter.engine.StandardJMeterEngine;
+import org.apache.jmeter.reporters.ResultCollector;
+import org.apache.jmeter.save.SaveService;
+import org.apache.jmeter.samplers.SampleSaveConfiguration;
+import org.apache.jmeter.visualizers.SummaryReport;
+import java.io.File;
+
+public class LoadTest {
+    public static void main(String[] args) throws Exception {
+        // Configurar JMeter
+        JMeterUtils.loadJMeterProperties("path/to/jmeter.properties");
+        JMeterUtils.setJMeterHome("path/to/jmeter");
+        JMeterUtils.initLocale();
+
+        // Configurar o plano de teste
+        StandardJMeterEngine jmeter = new StandardJMeterEngine();
+        HTTPSampler httpSampler = new HTTPSampler();
+        httpSampler.setDomain("localhost");
+        httpSampler.setPort(4723);
+        httpSampler.setPath("/wd/hub/session");
+        httpSampler.setMethod("POST");
+        Arguments params = new Arguments();
+        params.addArgument("desiredCapabilities", "{...}");
+        httpSampler.setArguments(params);
+
+        // Configurar ThreadGroup
+        ThreadGroup threadGroup = new ThreadGroup();
+        threadGroup.setNumThreads(100);
+        threadGroup.setRampUp(10);
+        threadGroup.setSamplerController(httpSampler);
+
+        // Configurar ResultCollector
+        ResultCollector logger = new ResultCollector();
+        SampleSaveConfiguration saveConfig = new SampleSaveConfiguration();
+        saveConfig.setAsXml(true);
+        logger.setSaveConfig(saveConfig);
+        logger.setFilename("path/to/results.jtl");
+
+        // Adicionar ao plano de teste
+        jmeter.configure(threadGroup);
+        jmeter.configure(httpSampler);
+        jmeter.configure(logger);
+
+        // Executar o plano de teste
+        jmeter.run();
+
+        // Gerar relatório de resumo
+        SummaryReport summary = new SummaryReport();
+        summary.load(new File("path/to/results.jtl"));
+        System.out.println(summary.toString());
+    }
+}
